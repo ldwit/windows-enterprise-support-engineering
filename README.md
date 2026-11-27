@@ -57,4 +57,4 @@ templates/        # DEV Community article template
 
 ## License
 
-_Choose a license (MIT is a common choice for scripts and docs)._
+Released under the [MIT License](LICENSE).
