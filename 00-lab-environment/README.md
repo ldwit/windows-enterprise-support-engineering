@@ -341,7 +341,50 @@ Close the terminal and open a new one so the new tools are on your `PATH`.
 
 ## Step 8: Verify the lab
 
-<!-- TODO: fill in with real output -->
+[`scripts/verify-lab.ps1`](scripts/verify-lab.ps1) checks the OS, time zone, Secure Boot, TPM, Guest Additions, and every tool.
+
+1. Close every terminal window, then open a new **Terminal (Admin)**. New windows pick up the `PATH` changes from Step 7.
+2. Save the script to `C:\LabSetup\verify-lab.ps1` (the same way as Step 7) and run it with PowerShell 7, so the Pester check sees modules installed for your user:
+
+   ```powershell
+   pwsh -File C:\LabSetup\verify-lab.ps1
+   winver
+   ```
+
+**What you should see:**
+
+```text
+=== Operating system ===
+OsName         : Microsoft Windows 11 Enterprise Evaluation
+OsVersion      : 10.0.26300
+OsBuildNumber  : 26300
+
+=== Time zone and clock ===
+Central Standard Time  |  11/28/2026 7:20:14 AM
+
+=== Firmware security ===
+Secure Boot enabled: True
+TPM present: True  ready: True
+
+=== Tool checks ===
+Check                         Result
+-----                         ------
+Guest Additions (VBoxService) PASS
+PowerShell 7 (pwsh)           PASS
+Pester 5+                     PASS
+Process Explorer              PASS
+Process Monitor               PASS
+Autoruns                      PASS
+ProcDump                      PASS
+WPR                           PASS
+WPA                           PASS
+WinDbg                        PASS
+Git                           PASS
+```
+
+**What it tells you:** Windows sees the virtual TPM and Secure Boot you set in Step 4, the clock matches your time zone, and every tool the later projects use is installed and on `PATH`. Fix any **FAIL** before you take the snapshot. See [Troubleshooting](#troubleshooting-this-lab).
+
+3. Launch each tool once to accept its EULA and dismiss first-run prompts, then close it: `procexp64`, `procmon64` (click **Cancel** on the filter dialog), `autoruns64`, `WinDbgX`, and **Windows Performance Analyzer** from the Start menu.
 
 ## Step 9: Take the `baseline` snapshot
 
