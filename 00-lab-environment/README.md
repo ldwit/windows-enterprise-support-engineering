@@ -390,7 +390,57 @@ Git                           PASS
 
 ## Step 9: Take the `baseline` snapshot
 
-<!-- TODO -->
+A snapshot saves the VM's disk and settings at one moment. Every project in this repo breaks the VM on purpose and then restores this snapshot, so it must be clean.
+
+### Prepare
+
+1. Check that the privacy toggles are off, the time zone is right, and updates are paused (Step 6).
+2. Empty the Recycle Bin, and clear temp files in PowerShell:
+
+   ```powershell
+   Remove-Item $env:TEMP\* -Recurse -Force -ErrorAction SilentlyContinue
+   ```
+
+3. **Shut down** Windows (**Start → Power → Shut down**). Don't use Restart or Save State.
+4. In VirtualBox, open **Settings → Storage**, select the optical drive, click the disc icon, and choose **Remove Disk from Virtual Drive**. Without the ISO attached, the VM boots straight to Windows with no "Press any key" prompt.
+
+Do steps 3 and 4 **before** you take the snapshot. A snapshot also records the VM's settings, so a change made afterward is undone on every restore.
+
+### Take the snapshot
+
+On the host, with the VM powered off:
+
+```bash
+VBoxManage snapshot Win11-Lab take baseline --description "Clean Win11 Enterprise eval, patched, updates paused, toolset installed $(date +%F)"
+VBoxManage snapshot Win11-Lab list
+```
+
+Or in the GUI: select `Win11-Lab` → the **☰** menu next to it → **Snapshots** → **Take**, and name it exactly `baseline`. If you used another name, rename it:
+
+```bash
+VBoxManage snapshot Win11-Lab edit "<old name>" --name baseline
+```
+
+**What you should see:**
+
+![VirtualBox Snapshots view showing the baseline snapshot for Win11-Lab](evidence/09-baseline-snapshot.png)
+
+**Why take it powered off:** an offline snapshot stores only the disk and settings, not RAM. It's smaller, and every restore cold-boots Windows like a real machine, which matters for the startup troubleshooting in Project 1.
+
+### Restore the snapshot (do this at the end of every project)
+
+1. Shut down the VM.
+2. Restore:
+
+   ```bash
+   VBoxManage snapshot Win11-Lab restore baseline
+   ```
+
+   Or in the GUI: **Snapshots** → select `baseline` → **Restore**, and uncheck **Create a snapshot of the current machine state**.
+
+3. Start the VM.
+
+<!-- TODO: restore test result + screenshot -->
 
 ---
 
