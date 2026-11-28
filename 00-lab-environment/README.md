@@ -382,6 +382,8 @@ WinDbg                        PASS
 Git                           PASS
 ```
 
+![verify-lab.ps1 output with all 11 checks passing](evidence/08-verify-lab-all-pass.png)
+
 **What it tells you:** Windows sees the virtual TPM and Secure Boot you set in Step 4, the clock matches your time zone, and every tool the later projects use is installed and on `PATH`. Fix any **FAIL** before you take the snapshot. See [Troubleshooting](#troubleshooting-this-lab).
 
 3. Launch each tool once to accept its EULA and dismiss first-run prompts, then close it: `procexp64`, `procmon64` (click **Cancel** on the filter dialog), `autoruns64`, `WinDbgX`, and **Windows Performance Analyzer** from the Start menu.
