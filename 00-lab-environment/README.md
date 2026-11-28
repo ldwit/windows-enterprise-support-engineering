@@ -1,6 +1,8 @@
 # Project 0: Build a Free Windows Support Lab
 
-> **Status:** In progress
+> **Status:** Complete
+
+> Hit a problem along the way? See [Troubleshooting this lab](#troubleshooting-this-lab). The root cause write-up for the most common one (VirtualBox's kernel module failing to build on a new Linux kernel) is in [rca.md](rca.md).
 
 Build a disposable Windows 11 Enterprise evaluation VM in VirtualBox, install the free Microsoft diagnostics toolset with one script, and save a clean `baseline` snapshot that every other project in this repo starts from.
 
@@ -248,7 +250,6 @@ Without TPM 2.0 or Secure Boot, Windows Setup stops with **"This PC can't run Wi
    - **Password and security questions:** lab-only values. Never reuse a real password.
 6. On the privacy screens, turn every option **off**. If you miss them, change them later in **Settings → Privacy & security** (Diagnostics & feedback, General, Location, Inking & typing, Tailored experiences). Fewer background services means less noise in later Process Monitor and WPR traces.
 
-<!-- TODO screenshots: boot prompt, disk selection, desktop -->
 
 ## Step 6: Install Guest Additions, set the clock, and patch
 
@@ -287,7 +288,6 @@ Get-Date
 
 **Why pause:** if updates download in the middle of a lab, `TiWorker.exe` and the update services spike CPU, disk, and network and pollute your Perfmon and WPR data. Every project restores to `baseline`, so the lab stays at one patch level.
 
-<!-- TODO screenshots: Guest Additions installer, Windows Update up to date + paused -->
 
 ## Step 7: Install the toolset
 
@@ -335,7 +335,29 @@ Invoke-WebRequest https://raw.githubusercontent.com/ldwit/windows-enterprise-sup
 
 **What you should see:** after 10–20 minutes, a summary table with every package **Installed** (or **Already installed** on a re-run). A full transcript is saved in `C:\LabLogs\`.
 
-<!-- TODO: paste real summary output + screenshot -->
+```text
+=== Summary ===
+Package                           Result
+-------                           ------
+PowerShell 7                      Installed
+WinDbg                            Installed
+Git                               Installed
+Windows Performance Toolkit (ADK) Installed
+Sysinternals Suite                Installed
+Pester                            Installed
+```
+
+If any row shows **FAILED** or **SKIPPED**, close the window, open a new **Terminal (Admin)**, and run the script again. Installed packages are skipped, so only the failed ones are retried. You can also check each piece by hand:
+
+```powershell
+Test-Path C:\Tools\Sysinternals\procexp64.exe   # Sysinternals -> True
+Get-Command pwsh | Select-Object Source           # PowerShell 7 location
+pwsh -c "Get-Module Pester -ListAvailable | Select-Object Name, Version"
+```
+
+![PowerShell 7.7 with Pester 6.2.0 installed and Sysinternals present](evidence/07-pester-sysinternals-installed.png)
+
+`Get-Module Pester` lists two versions: the one you installed (5 or later) and the old Pester 3.4.0 that ships with Windows. That's expected. `-SkipPublisherCheck` is needed because the inbox 3.4.0 is signed with a different certificate.
 
 Close the terminal and open a new one so the new tools are on your `PATH`.
 
@@ -440,7 +462,16 @@ VBoxManage snapshot Win11-Lab edit "<old name>" --name baseline
 
 3. Start the VM.
 
-<!-- TODO: restore test result + screenshot -->
+### Test the restore
+
+Prove the snapshot works before you rely on it:
+
+1. Start the VM, create a file on the desktop named `break-me.txt`, and shut down.
+2. Restore `baseline` (above) and start the VM.
+
+**What you should see:** `break-me.txt` is gone, and the desktop is exactly as it was when you took the snapshot.
+
+**What it tells you:** any change you make during a lab, whether a broken service, a registry edit, or a crashed app, is thrown away by one restore. That's what makes the lab safe to break.
 
 ---
 
@@ -466,6 +497,7 @@ VBoxManage snapshot Win11-Lab edit "<old name>" --name baseline
 | Pester shows **SKIPPED (pwsh.exe not found)** | PowerShell 7 was just installed, and the current window can't see it yet | Open a new elevated window and run the script again. Installed packages are skipped. |
 | `verify-lab.ps1` shows **FAIL** for Process Explorer, Process Monitor, Autoruns, and ProcDump, but `Test-Path C:\Tools\Sysinternals\procexp64.exe` is `True` | The terminal was opened before `C:\Tools\Sysinternals` was added to the machine `PATH`. A process keeps the environment it started with, and so do its children (like `pwsh`). | Close every terminal window, open a new one, and run the check again. |
 | Time zone shows the wrong region (for example **China Standard Time**) after setup | The region chosen during setup, or a default from the ISO | `Set-TimeZone -Id '<your zone>'; w32tm /resync`. Run `Start-Service w32time` first if `w32tm` says the service isn't running. |
+| VirtualBox shows **Current State (changed)** right after you take the snapshot | A VM setting changed after the snapshot (for example, the ISO was removed afterward). A restore would bring the old setting back. | Delete the snapshot, make the change, and take it again with the VM powered off. |
 | `winget` not found | App Installer is out of date | Microsoft Store → **Library → Get updates**, or update **App Installer**. |
 
 ## Clean up and reset

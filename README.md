@@ -13,7 +13,7 @@ Every project is a **step-by-step tutorial** you can follow in your own lab usin
 
 | Project | Topic | Tools | Status |
 |---|---|---|---|
-| [Project 0](00-lab-environment/README.md) | Build a Free Windows Support Lab | Windows 11 Enterprise evaluation, VirtualBox / Hyper-V, winget, Sysinternals, Windows Performance Toolkit, WinDbg, PowerShell 7 | Not started |
+| [Project 0](00-lab-environment/README.md) | Build a Free Windows Support Lab | Windows 11 Enterprise evaluation, VirtualBox / Hyper-V, winget, Sysinternals, Windows Performance Toolkit, WinDbg, PowerShell 7 | Complete |
 | [Project 1](01-windows-troubleshooting/README.md) | Windows Startup and Application Troubleshooting | Event Viewer, Autoruns, Process Monitor, Reliability Monitor, msconfig | Not started |
 | [Project 2](02-performance-analysis/README.md) | CPU and Memory Performance Analysis | Task Manager, Resource Monitor, Process Explorer, Performance Monitor, ProcDump, WinDbg | Not started |
 | [Project 3](03-advanced-diagnostics/README.md) | Advanced Diagnostics with WPR and WPA | Windows Performance Recorder, Windows Performance Analyzer | Not started |
