@@ -67,7 +67,8 @@ $results = foreach ($pkg in $packages) {
                     '--accept-source-agreements', '--accept-package-agreements')
     if ($pkg.Override) { $wingetArgs += @('--override', $pkg.Override) }
 
-    & winget @wingetArgs
+    # Send winget output to the console; otherwise the foreach captures it into $results.
+    & winget @wingetArgs | Out-Host
     $status = if ($LASTEXITCODE -eq 0) { 'Installed' } else { "FAILED (winget exit code $LASTEXITCODE)" }
     [pscustomobject]@{ Package = $pkg.Name; Result = $status }
 }
