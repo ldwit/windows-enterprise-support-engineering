@@ -291,12 +291,12 @@ Get-Date
 
 ## Step 7: Install the toolset
 
-[`scripts/install-tools.ps1`](scripts/install-tools.ps1) installs everything with `winget` in one run:
+[`scripts/install-tools.ps1`](scripts/install-tools.ps1) installs everything in one run:
 
 | Tool | winget ID | Used in |
 |---|---|---|
 | PowerShell 7 | `Microsoft.PowerShell` | Projects 4, 6, 8 |
-| Sysinternals Suite (Process Explorer, Process Monitor, Autoruns, ProcDump) | `Microsoft.Sysinternals.Suite` | Projects 1, 2, 8 |
+| Sysinternals Suite (Process Explorer, Process Monitor, Autoruns, ProcDump) | Zip from `download.sysinternals.com` to `C:\Tools\Sysinternals`, added to `PATH` | Projects 1, 2, 8 |
 | WinDbg | `Microsoft.WinDbg` | Projects 2, 8 |
 | Git | `Git.Git` | All |
 | Windows Performance Toolkit (WPR, WPA) from the Windows ADK | `Microsoft.WindowsADK` (WPT feature only) | Project 3 |
@@ -367,6 +367,8 @@ Close the terminal and open a new one so the new tools are on your `PATH`.
 | `.\install-tools.ps1` "is not recognized" | Notepad saved it as `install-tools.ps1.txt` | `Rename-Item C:\LabSetup\install-tools.ps1.txt install-tools.ps1`. Turn on **File Explorer → View → Show → File name extensions**. |
 | File timestamps in the VM are hours off | VM time zone is wrong | `Set-TimeZone -Id '<your zone>'; w32tm /resync` |
 | "running scripts is disabled on this system" | Default execution policy | `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force` (this window only). |
+| Sysinternals install fails: **"The requested operation is not permitted from an administrator context on packages installed within the user scope"** (exit code `-1978335107`) | The winget `Microsoft.Sysinternals.Suite` package is a per-user package, and winget won't install per-user packages from an elevated window | The script downloads the official zip to `C:\Tools\Sysinternals` instead. Run the current version of `install-tools.ps1`. |
+| Pester shows **SKIPPED (pwsh.exe not found)** | PowerShell 7 was just installed, and the current window can't see it yet | Open a new elevated window and run the script again. Installed packages are skipped. |
 | `winget` not found | App Installer is out of date | Microsoft Store → **Library → Get updates**, or update **App Installer**. |
 
 ## Clean up and reset
