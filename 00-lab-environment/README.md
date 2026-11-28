@@ -369,6 +369,8 @@ Close the terminal and open a new one so the new tools are on your `PATH`.
 | "running scripts is disabled on this system" | Default execution policy | `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force` (this window only). |
 | Sysinternals install fails: **"The requested operation is not permitted from an administrator context on packages installed within the user scope"** (exit code `-1978335107`) | The winget `Microsoft.Sysinternals.Suite` package is a per-user package, and winget won't install per-user packages from an elevated window | The script downloads the official zip to `C:\Tools\Sysinternals` instead. Run the current version of `install-tools.ps1`. |
 | Pester shows **SKIPPED (pwsh.exe not found)** | PowerShell 7 was just installed, and the current window can't see it yet | Open a new elevated window and run the script again. Installed packages are skipped. |
+| `verify-lab.ps1` shows **FAIL** for Process Explorer, Process Monitor, Autoruns, and ProcDump, but `Test-Path C:\Tools\Sysinternals\procexp64.exe` is `True` | The terminal was opened before `C:\Tools\Sysinternals` was added to the machine `PATH`. A process keeps the environment it started with, and so do its children (like `pwsh`). | Close every terminal window, open a new one, and run the check again. |
+| Time zone shows the wrong region (for example **China Standard Time**) after setup | The region chosen during setup, or a default from the ISO | `Set-TimeZone -Id '<your zone>'; w32tm /resync`. Run `Start-Service w32time` first if `w32tm` says the service isn't running. |
 | `winget` not found | App Installer is out of date | Microsoft Store → **Library → Get updates**, or update **App Installer**. |
 
 ## Clean up and reset
